@@ -2,6 +2,7 @@ package BT_2;
 
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Group;
@@ -267,13 +268,29 @@ public class QuanLySinhVien {
 		btn_moFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+				FileDialog fileDialog = new FileDialog(shlQuanLySinh, SWT.OPEN);
+				fileDialog.setText("Open");
+				String[] filter={"*.txt"};
+				fileDialog.setFilterExtensions(filter);
+				String selectString=fileDialog.open();
+				System.out.println(selectString);
 			}
 		});
 		btn_moFile.setBounds(21, 341, 75, 25);
 		btn_moFile.setText("M\u1EDF file");
 		
 		btn_luuFile = new Button(shlQuanLySinh, SWT.NONE);
+		btn_luuFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fileDialog = new FileDialog(shlQuanLySinh, SWT.SAVE);
+				fileDialog.setText("Save");
+				String[] filter={"*.txt"};
+				fileDialog.setFilterExtensions(filter);
+				String selectString=fileDialog.open();
+				System.out.println(selectString);
+			}
+		});
 		btn_luuFile.setBounds(102, 341, 75, 25);
 		btn_luuFile.setText("L\u01B0u file");
 		
