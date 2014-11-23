@@ -1,0 +1,113 @@
+package BT1;
+
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import BT1.StudentDetails;
+
+public class Login {
+
+	protected Shell shell;
+	private Text txt_userName;
+	private Text txt_passWord;
+	
+	int errorLogin=0;
+
+	/**
+	 * Launch the application.
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			Login window = new Login();
+			window.open();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Open the window.
+	 */
+	public void open() {
+		Display display = Display.getDefault();
+		createContents();
+		shell.open();
+		shell.layout();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+	}
+
+	/**
+	 * Create contents of the window.
+	 */
+	protected void createContents() {
+		shell = new Shell();
+		shell.setSize(325, 229);
+		
+		Label lblNewLabel = new Label(shell, SWT.NONE);
+		lblNewLabel.setBounds(30, 61, 63, 15);
+		lblNewLabel.setText("User name");
+		
+		Label lblNewLabel_1 = new Label(shell, SWT.NONE);
+		lblNewLabel_1.setBounds(30, 104, 63, 15);
+		lblNewLabel_1.setText("Password");
+		
+		txt_userName = new Text(shell, SWT.BORDER);
+		txt_userName.setBounds(93, 58, 165, 21);
+		
+		txt_passWord = new Text(shell, SWT.BORDER | SWT.PASSWORD);
+		txt_passWord.setBounds(93, 98, 165, 21);
+		
+		Button btnNewButton = new Button(shell, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(txt_userName.getText().equals("Adminuser")&&txt_passWord.getText().equals("admin")){					
+					StudentDetails form =new StudentDetails();
+					shell.close();
+					form.open();
+				}					
+				else {
+					errorLogin++;
+					MessageBox messageBox=new MessageBox(shell, SWT.ERROR|SWT.OK);
+					messageBox.setMessage("Error Password or UserName");
+					messageBox.setText("Error");
+					messageBox.open();
+				}
+				if(errorLogin==3) System.exit(0);
+			}
+		});
+		btnNewButton.setBounds(96, 144, 75, 25);
+		btnNewButton.setText("Login");
+		
+		Button btnNewButton_1 = new Button(shell, SWT.NONE);
+		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				shell.close();
+			}
+		});
+		btnNewButton_1.setBounds(183, 143, 75, 25);
+		btnNewButton_1.setText("Cancel");
+		
+
+		Label lblLogin = new Label(shell, SWT.NONE);
+		lblLogin.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.NORMAL));
+		lblLogin.setBounds(93, 10, 117, 36);
+		lblLogin.setText("Form Login");
+
+	}
+}
