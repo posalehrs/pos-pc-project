@@ -274,6 +274,8 @@ public class QuanLySinhVien {
 				fileDialog.setFilterExtensions(filter);
 				String selectString=fileDialog.open();
 				System.out.println(selectString);
+				
+				
 			}
 		});
 		btn_moFile.setBounds(21, 341, 75, 25);
@@ -289,6 +291,8 @@ public class QuanLySinhVien {
 				fileDialog.setFilterExtensions(filter);
 				String selectString=fileDialog.open();
 				System.out.println(selectString);
+				
+				
 			}
 		});
 		btn_luuFile.setBounds(102, 341, 75, 25);
