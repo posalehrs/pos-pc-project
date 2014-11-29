@@ -1,6 +1,11 @@
 package BT_2;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
@@ -17,6 +22,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 public class QuanLySinhVien {
+	
+	public static String pathWrite;
+	public static String pathRead;
 
 	protected Shell shlQuanLySinh;
 	private Text txt_maSinhVien;
@@ -102,7 +110,7 @@ public class QuanLySinhVien {
 		
 		btnThm = new Button(grpThngTinSinh, SWT.NONE);
 		btnThm.addSelectionListener(new SelectionAdapter() {
-			@Override
+			@Override 
 			public void widgetSelected(SelectionEvent e) {	
 				clickThem();
 			}
@@ -115,14 +123,11 @@ public class QuanLySinhVien {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (txt_maSinhVien.getText().isEmpty()&& txt_ngaySinh.getText().isEmpty()&& txt_tenSinhVien.getText().isEmpty()) {
-					MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ERROR| SWT.OK);
-					messageBox.setMessage("Mã sinh viên,tên sinh viên,ngày sinh không được bỏ trống!!!\nVui lòng điền đầy đủ thông tin");
-					messageBox.setText("Error");
-					messageBox.open();
+					myMessageBox(SWT.ERROR, SWT.OK, SWT.NO, "Mã sinh viên,tên sinh viên,ngày sinh không được bỏ trống!!!\nVui lòng điền đầy đủ thông tin", "Error");
 					return;
 				}
 				if(!testTrungMaSinhVien()) return;
-				if(!testNgaySinh(txt_ngaySinh.getText())) return;
+//				if(!testNgaySinh(txt_ngaySinh.getText())) return;
 				item = new TableItem(tbl_sinhVien, SWT.NONE);
 				item.setText(new String[] {""+txt_maSinhVien.getText(),""+txt_tenSinhVien.getText(),""+txt_ngaySinh.getText()});
 				initButton();
@@ -140,10 +145,7 @@ public class QuanLySinhVien {
 				
 				TableItem[] items = tbl_sinhVien.getSelection();
 				if(items.length==0) {
-					MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ERROR| SWT.OK);
-					messageBox.setMessage("Chọn một sinh viên trong danh dách sinh viên");
-					messageBox.setText("Error");
-					messageBox.open();
+					myMessageBox(SWT.ERROR, SWT.OK, SWT.NO, "Chọn một sinh viên trong danh dách sinh viên", "Error");
 					return;
 				}
 				
@@ -162,16 +164,10 @@ public class QuanLySinhVien {
 
 				TableItem[] items = tbl_sinhVien.getSelection();
 				if(items.length==0) {
-					MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ERROR| SWT.OK);
-					messageBox.setMessage("Chọn một sinh viên trong danh dách sinh viên");
-					messageBox.setText("Error");
-					messageBox.open();
+					myMessageBox(SWT.ERROR, SWT.OK, SWT.NO, "Chọn một sinh viên trong danh dách sinh viên", "Error");
 					return;
 				}
-				MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ICON_QUESTION| SWT.OK|SWT.CANCEL);
-				messageBox.setMessage("Có chắc muốn xóa sinh viên "+txt_tenSinhVien.getText()+" không?");
-				messageBox.setText("Question");
-				if(messageBox.open()==SWT.CANCEL) return;
+				if(myMessageBox(SWT.ICON_QUESTION, SWT.OK, SWT.CANCEL, "Có chắc muốn xóa sinh viên "+txt_tenSinhVien.getText()+" không?", "Question")==SWT.CANCEL) return;
 				int indexRemo=tbl_sinhVien.getSelectionIndex();
 				tbl_sinhVien.remove(indexRemo);
 				
@@ -255,10 +251,8 @@ public class QuanLySinhVien {
 		btn_thoat.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageBox messageBox =new MessageBox(shlQuanLySinh, SWT.ICON_QUESTION|SWT.OK|SWT.CANCEL);
-				messageBox.setMessage("Do you want exit");
-				messageBox.setText("Question");
-				if(messageBox.open()==SWT.OK) System.exit(0);
+				if(myMessageBox(SWT.ICON_QUESTION, SWT.OK, SWT.CANCEL, "Do you want exit", "Question")==SWT.OK) 
+					System.exit(0);				
 			}
 		});
 		btn_thoat.setBounds(415, 341, 75, 25);
@@ -289,10 +283,26 @@ public class QuanLySinhVien {
 				fileDialog.setText("Save");
 				String[] filter={"*.txt"};
 				fileDialog.setFilterExtensions(filter);
-				String selectString=fileDialog.open();
-				System.out.println(selectString);
+				pathWrite =fileDialog.open();
 				
+				try {
+					FileInputStream file=new FileInputStream(pathWrite);
+					if(myMessageBox(SWT.ICON_QUESTION, SWT.OK, SWT.CANCEL, "Có muốn ghi đè không?", "Question")==SWT.CANCEL) return;
+				} catch (FileNotFoundException e1) {
+				}
 				
+				FileOutputStream fos;
+				try {
+					fos = new FileOutputStream(pathWrite,false);
+					PrintWriter pw= new PrintWriter(fos);
+					for (TableItem tableItem : tbl_sinhVien.getItems()) {
+					String string=tableItem.getText(0)+"\t"+tableItem.getText(1)+"\t"+tableItem.getText(2);
+					pw.println(string);
+					}
+					pw.close();
+					
+				} catch (FileNotFoundException e1) {}
+				myMessageBox(SWT.ICON_INFORMATION, SWT.OK, SWT.NO, "Đã lưu thành công!!", "Infomation");
 			}
 		});
 		btn_luuFile.setBounds(102, 341, 75, 25);
@@ -315,6 +325,8 @@ public class QuanLySinhVien {
 
 		initButton();
 	}
+	
+	//Khi click vao nut file
 	private void clickFile(){
 		btn_moFile.setVisible(true);
 		btn_huy.setVisible(true);
@@ -323,6 +335,8 @@ public class QuanLySinhVien {
 		btn_File.setVisible(false);
 		btn_csdl.setVisible(false);
 	}
+	
+	//khoi tao khi bat dau chay
 	private void initButton(){
 		btn_moFile.setVisible(false);
 		btn_huy.setVisible(false);
@@ -333,6 +347,8 @@ public class QuanLySinhVien {
 		btn_xoa.setEnabled(true);
 		btn_sua.setEnabled(true);
 	}
+	
+	//Khi click vao nut them
 	private void clickThem(){
 		btnThm.setVisible(false);
 		btn_huyThem.setVisible(true);
@@ -341,6 +357,8 @@ public class QuanLySinhVien {
 		btn_sua.setEnabled(false);
 		
 	}
+	
+	//kiem tra ngay sinh truoc khi luu
 	private boolean testNgaySinh(String ngaySinh){
 		try{
 		int date=Integer.parseInt(ngaySinh.substring(3, 5));
@@ -348,24 +366,28 @@ public class QuanLySinhVien {
 		if(1<=date&&date<=31&&1<=month&&month<=12)return true;
 		else return false;
 		}catch(Exception e){
-			MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ERROR| SWT.OK);
-			messageBox.setMessage("Ngày sinh không đúng định dạng!!!\nVí dụ: 12/11/2011");
-			messageBox.setText("Error");
-			messageBox.open();
+			myMessageBox(SWT.ERROR, SWT.OK, SWT.NO, "Ngày sinh không đúng định dạng!!!\nVí dụ: 12/11/2011", "Error");
 			return false;
 		}
 	}
+	
+	//kiem tra co bi trung ma sinh vien khi nhap vao
 	private boolean testTrungMaSinhVien(){
 		TableItem[] items=tbl_sinhVien.getItems();
 		for (TableItem tableItem : items) {
 			if(tableItem.getText(0).equals(txt_maSinhVien.getText())){
-				MessageBox messageBox = new MessageBox(shlQuanLySinh, SWT.ERROR| SWT.OK);
-				messageBox.setMessage("Mã sinh viên "+tableItem.getText(0)+" đã tồn tại\nVui lòng nhập mã sinh viên khác");
-				messageBox.setText("Error");
-				messageBox.open();
+				myMessageBox(SWT.ERROR, SWT.OK, SWT.NO, "Mã sinh viên "+tableItem.getText(0)+" đã tồn tại\nVui lòng nhập mã sinh viên khác", "Error");
 				return false;
 			}
 		}
 		return true;
+	}
+	
+	//MessageBox
+	public int myMessageBox(int icon,int button_1,int button_2,String message,String text) {
+		MessageBox messageBox = new MessageBox(shlQuanLySinh, icon| button_1|button_2);
+		messageBox.setMessage(message);
+		messageBox.setText(text);
+		return messageBox.open();
 	}
 }
